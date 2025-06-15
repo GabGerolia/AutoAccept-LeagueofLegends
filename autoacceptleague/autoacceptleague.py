@@ -2,7 +2,7 @@ import pyautogui
 import time
 
 
-delay = 0.5
+delay = 1 
 
 def autoaccept():
     while True:
@@ -12,7 +12,7 @@ def autoaccept():
             accept = pyautogui.locateCenterOnScreen('KRacceptbtn.png', confidence=0.8)
             if accept is not None:
                 pyautogui.click(accept)
-                print("found")
+                print("Accepted")
                 break
 
         except Exception as e:
@@ -21,17 +21,22 @@ def autoaccept():
         time.sleep(delay)
 
 def autoban():
+    global insideMatch
+    global done
 
     #1280x720 resolution league only
-
+    i = 0
     while True:
         try:
             print("Finding searchbar...")
             search = pyautogui.locateCenterOnScreen('search.png', confidence=0.8)
             if search is not None:
                 x, y = search #save coordinates
-
-                time.sleep(25) #buffer 25secs (wait for ban phase)
+                pyautogui.moveTo(search) #move cursor to searchbar
+                print("Match found")
+                print("Waiting for Banning phase!")
+                time.sleep(20) #buffer 20secs (wait for ban phase)
+                print("Ban Phase detected")
                 pyautogui.click(search) #click searchbar
                 pyautogui.write("leblanc") #write champ to ban
 
@@ -48,16 +53,42 @@ def autoban():
 
                 time.sleep(1)
                 pyautogui.click(x, y) #click ban btn
-                print("done")
+                print("DONE")
+                done = True
                 break
         except Exception as e:
-            print(f"-: {e}")
+            print(f"{e}")
 
+        i += 1 
+        if i >= 20: #wait for 20 secs
+            insideMatch = False
+        else:
+            print(f"checking if in game: {i}")
+            insideMatch = True
+        ######    
+        if insideMatch == False:
+            insideMatch = False
+            break
         time.sleep(delay)
 
+
 def main():
-    autoaccept()
-    autoban()
+    global insideMatch
+    global done
+    insideMatch = False
+    done = False
+
+    while True:
+        if insideMatch == True:
+            autoban()
+            if done == True:
+                break
+            else:
+                continue
+        else:
+            autoaccept()
+            insideMatch = True
+
 
 if __name__ == "__main__":
     main()
