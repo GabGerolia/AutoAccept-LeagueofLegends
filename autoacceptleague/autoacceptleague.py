@@ -2,21 +2,23 @@ import pyautogui
 import time
 
 
-delay = 1 
+imageAcceptbtn = "KRacceptbtn.png" #change image name depends on language
+champtoBan = "leblanc" #change who to ban
 
+#do not change beyond this point
+delay = 1 #1second
 def autoaccept():
     while True:
         try:
             print("Finding accept...")
-            #change image name depends on language
-            accept = pyautogui.locateCenterOnScreen('KRacceptbtn.png', confidence=0.8)
+            accept = pyautogui.locateCenterOnScreen(imageAcceptbtn , confidence=0.8)
             if accept is not None:
                 pyautogui.click(accept)
                 print("Accepted")
                 break
 
         except Exception as e:
-            print(f"-: {e}")
+            print(f"{e}")
         
         time.sleep(delay)
 
@@ -38,7 +40,7 @@ def autoban():
                 time.sleep(20) #buffer 20secs (wait for ban phase)
                 print("Ban Phase detected")
                 pyautogui.click(search) #click searchbar
-                pyautogui.write("leblanc") #write champ to ban
+                pyautogui.write(champtoBan)
 
                 #change coords
                 x = x - 356
@@ -61,11 +63,25 @@ def autoban():
 
         i += 1 
         if i >= 20: #wait for 20 secs
+            print("Assumed Match Declined")
             insideMatch = False
+        elif i >=10: #wait for 10 secs
+            try:
+                print(f"checking if in game: {i}")
+                print("Finding accept...")
+                accept = pyautogui.locateCenterOnScreen(imageAcceptbtn , confidence=0.8)
+                if accept is not None:
+                    pyautogui.click(accept)
+                    print("Accepted")
+                    break
+            except Exception as e:
+                print(f"{e}")
+            else:
+                continue
         else:
             print(f"checking if in game: {i}")
             insideMatch = True
-        ######    
+
         if insideMatch == False:
             insideMatch = False
             break
